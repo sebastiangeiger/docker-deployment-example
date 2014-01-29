@@ -38,9 +38,8 @@ RUN apt-get -yqq install nginx-extras passenger
 # ADD nginx.conf ...
 
 # Copy application files over
-RUN mkdir -p /var/www
-ADD . /var/www/docker-deployment-example
-RUN cd /var/www/docker-deployment-example && sh install_app
+ADD . /app
+RUN cd /app && sh install_app
 
 # Now run it
 EXPOSE 80

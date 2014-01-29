@@ -2,7 +2,7 @@
 
 set -e
 
-cd /var/www/docker-deployment-example
+cd /app
 gem install --no-document bundler
 bundle install --without development test
 
