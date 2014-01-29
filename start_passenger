@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -e
-cd /var/www/docker-deployment-example
-
-bundle exec rake db:create
-bundle exec rake db:migrate
-
-passenger start -p 80 -e $RAILS_ENV

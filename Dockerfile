@@ -2,7 +2,7 @@
 # http://dockerfile.github.io/#/nginx and https://github.com/zumbrunnen/docker-rails
 # Run it with: `docker run -d -name <containername> -link <dbcontainer>:db -v /var/www/<dir>:/var/www/<dir> -e APP_NAME=<appname> zumbrunnen/rails`
 
-FROM ubuntu:12.10
+FROM ubuntu:13.10
 MAINTAINER Sebastian Geiger <sebastian.geiger@mo-stud.io>
 
 # Setting environment variables
@@ -27,32 +27,21 @@ RUN apt-get install -yqq postgresql-client libpq5 libpq-dev
 # Install Nodejs to satisfy the execjs gem
 RUN apt-get install -yqq nodejs
 
-# Install Nginx.
-RUN apt-get install -yqq software-properties-common
-RUN add-apt-repository -y ppa:nginx/stable
-RUN apt-get install -yqq nginx
-RUN echo "\ndaemon off;" >> /etc/nginx/nginx.conf
+# Install Passenger / Nginx
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7
+RUN apt-get -yqq install apt-transport-https ca-certificates
+ADD passenger.list /etc/apt/sources.list.d/passenger.list
+RUN chown root: /etc/apt/sources.list.d/passenger.list
+RUN chmod 600 /etc/apt/sources.list.d/passenger.list
+RUN apt-get -qq update
+RUN apt-get -yqq install nginx-extras passenger
+# ADD nginx.conf ...
 
-# Install supervisord
-RUN apt-get install -yqq supervisor
-
-# Attach volumes.
-# VOLUME /etc/nginx/sites-enabled
-# VOLUME /var/log/nginx
-#
-# # Set working directory.
-# WORKDIR /etc/nginx
-#
-# Create startup file for passenger and start supervisord
-ADD start_passenger /opt/start_passenger
-ADD supervisord.conf /etc/supervisor/supervisord.conf
-ADD passenger.conf /etc/supervisor/conf.d/passenger.conf
-
-# Copy files over
+# Copy application files over
 RUN mkdir -p /var/www
 ADD . /var/www/docker-deployment-example
 RUN cd /var/www/docker-deployment-example && sh install_app
 
-# Now run supervisord
+# Now run it
 EXPOSE 80
-CMD ["/usr/bin/supervisord", "-n"]
+CMD ["/usr/bin/nginx"]
