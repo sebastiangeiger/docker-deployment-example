@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+cd /var/www/docker-deployment-example
+gem install --no-document bundler
+bundle install --without development test
+
+if ! gem spec passenger > /dev/null 2>&1; then
+  gem install --no-document passenger
+fi
+
+rake assets:precompile
