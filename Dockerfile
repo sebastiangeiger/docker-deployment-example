@@ -35,7 +35,7 @@ RUN chown root: /etc/apt/sources.list.d/passenger.list
 RUN chmod 600 /etc/apt/sources.list.d/passenger.list
 RUN apt-get -qq update
 RUN apt-get -yqq install nginx-extras passenger
-# ADD nginx.conf ...
+ADD nginx.conf /etc/nginx/nginx.conf
 
 # Copy application files over
 ADD . /app
@@ -43,4 +43,4 @@ RUN cd /app && sh install_app
 
 # Now run it
 EXPOSE 80
-CMD ["/usr/bin/nginx"]
+CMD ["/usr/sbin/nginx"]
